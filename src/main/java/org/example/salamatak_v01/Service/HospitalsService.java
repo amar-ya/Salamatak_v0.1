@@ -18,7 +18,7 @@ public class HospitalsService
     }
 
     public void addHospital(Hospitals hospitals){
-        hospitals.setIs_active(false);
+        hospitals.setIs_active("pending");
         hospitalsRepository.save(hospitals);
     }
 

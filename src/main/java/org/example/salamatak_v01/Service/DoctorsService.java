@@ -34,7 +34,7 @@ public class DoctorsService
 
     public String addDoctor(Integer hospital_id,Doctors doctors){
         Hospitals requester = hospitalsRepository.findHospitalsById(hospital_id);
-        if (requester.getIs_active() == false){
+        if (requester.getIs_active().equals("pending") || requester.getIs_active().equals("reject")){
             return "hospital is not active";
         }else if (requester.getId().equals(doctors.getHospital_id())){
             doctors.setHospital_id(hospital_id);

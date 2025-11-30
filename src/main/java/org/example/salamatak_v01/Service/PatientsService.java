@@ -123,7 +123,7 @@ public class PatientsService
         Patients p = patientsRepository.findPatientByLoginKey(key);
         Times t = patientsRepository.findTimeByPatientId(p.getId());
         if (t == null){
-            return "faild";
+            return "failed";
         }else {
             Doctors d = patientsRepository.findDoctorBySessionsDoc_Id(t.getDoctor_id());
             String answer = aiClient.prepareQuestionsToAsksDoctor(t.getTime(),d.getSpeciality(),feeling);

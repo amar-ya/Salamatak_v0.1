@@ -2,6 +2,7 @@ package org.example.salamatak_v01.Model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class Hospitals
     @NotEmpty(message = "what is the phone number?")
     @Size(min = 8, max = 12, message = "first name shouldn't be less than 8 characters or more than 12")
     private String phone;
-    @Column(columnDefinition = "boolean")
-    private Boolean is_active = false;
+    @Column(columnDefinition = "varchar(8)")
+    @Pattern(regexp = "^(pending|accept|reject)$", message = "the active stat can only be pending accept or reject")
+    private String is_active;
 }
