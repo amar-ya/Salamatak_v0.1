@@ -71,4 +71,14 @@ public class AdminController
             return ResponseEntity.status(400).body(new ApiResponse(result));
         }
     }
+
+    @PutMapping("/reject-hospital/{id}")
+    public ResponseEntity<?> rejectHospital(@PathVariable Integer id){
+        String result = adminService.rejectHospital(id);
+        if (result.equals("success")){
+            return ResponseEntity.status(200).body(new ApiResponse("hospital rejected successfully"));
+        }else {
+            return ResponseEntity.status(400).body(new ApiResponse(result));
+        }
+    }
 }

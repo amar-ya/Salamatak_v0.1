@@ -48,10 +48,23 @@ public class AdminService
         Hospitals h = hospitalsRepository.findHospitalsById(id);
         if (h == null){
             return "this hospital are not registered yet";
-        }else if (h.getIs_active()){
+        }else if (h.getIs_active().equals("accept")){
             return "this hospital is already activated";
         }else {
-            h.setIs_active(true);
+            h.setIs_active("accept");
+            hospitalsRepository.save(h);
+            return "success";
+        }
+    }
+
+    public String rejectHospital(Integer id){
+        Hospitals h = hospitalsRepository.findHospitalsById(id);
+        if(h == null){
+            return "this hospital are not registered yet";
+        }else if(h.getIs_active().equals("reject")){
+            return "this hospital is already rejected";
+        }else {
+            h.setIs_active("reject");
             hospitalsRepository.save(h);
             return "success";
         }

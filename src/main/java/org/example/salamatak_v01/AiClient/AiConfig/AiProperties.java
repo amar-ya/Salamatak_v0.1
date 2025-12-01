@@ -11,6 +11,4 @@ public class AiProperties {
     private String baseUrl;
     private String apiKey;
     private String model;
-
-
 }
