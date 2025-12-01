@@ -9,7 +9,7 @@ import java.util.Date;
 public interface AiClient {
 
 
-    String getHealthAdvice(Float height, Float weight, Float bmi, Date birthdate,String gender);
+    String getHealthAdvice(Float height, Float weight, Float bmi, Date birthdate,String gender,String name);
 
     String getFeelingAdvice(String userDescription);
 

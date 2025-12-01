@@ -27,7 +27,7 @@ public class OpenAiClient implements AiClient {
     }
 
     @Override
-    public String getHealthAdvice(Float height, Float weight, Float bmi, Date birthdate,String gender) {
+    public String getHealthAdvice(Float height, Float weight, Float bmi, Date birthdate,String gender,String name) {
         Map<String, Object> requestBody = Map.of(
                 "model", props.getModel(),
                 "messages", List.of(
@@ -39,10 +39,12 @@ public class OpenAiClient implements AiClient {
                                     You are NOT a doctor and you must always remind the user that your advice
                                     is general and not a substitute for medical diagnosis.
                                     Keep your answer clear, friendly, and under 100 words.
+                                    the default language in answering is arabic unless the user`s name is none arab name like mike or john for example but if names like ammar muhammed go with the default
+                                    
                                     """),
                         Map.of("role", "user",
                                 "content",
-                                "Give me health and lifestyle advice based on these details: " +
+                                "Patient name is : "+ name +" Give me health and lifestyle advice based on these details: " +
                                         "gender: "+ gender + " , " +
                                         "date of birth: " + birthdate + " , " +
                                         "Height: " + height + " Meter, " +
@@ -92,6 +94,7 @@ public class OpenAiClient implements AiClient {
                                     - Do NOT give treatment plans. Only general self-care and specialty suggestions.
                                     - Keep the tone kind, non-judgmental, and encouraging.
                                     - Keep the answer under about 100 words.
+                                    and you must respond in the same language of the user that used in the question.
                                     """
                         ),
                         Map.of(
@@ -146,6 +149,7 @@ public class OpenAiClient implements AiClient {
                                         - Do NOT give treatment instructions.
                                         - Keep wording simple, helpful, and respectful.
                                         - Output ONLY the 5 questions in a numbered list.
+                                        - and you must respond in the same language of the user that used in the question.
                                     """
                         ),
                         Map.of(

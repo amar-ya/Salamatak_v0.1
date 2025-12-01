@@ -76,13 +76,13 @@ public class PatientsController
     @GetMapping("/ai/health-advice/{key}")
     public ResponseEntity<?> getHealthAdvice(@PathVariable String key){
         String result = patientsService.getHealthAdvice(key);
-        return ResponseEntity.status(200).body(new ApiResponse(result));
+        return ResponseEntity.status(200).body(result);
     }
 
     @GetMapping("/ai/explain-feeling")
     public ResponseEntity<?> getFeelingAdvice(@RequestBody String feeling){
         String result = patientsService.getFeelingAdvice(feeling);
-        return ResponseEntity.status(200).body(new ApiResponse(result));
+        return ResponseEntity.status(200).body(result);
     }
 
     @PostMapping("/forgot-password/{id}")
@@ -131,7 +131,7 @@ public class PatientsController
         if (result.equals("failed")) {
             return ResponseEntity.status(400).body(new ApiResponse("you dont have any session reserved"));
         }else {
-            return ResponseEntity.status(200).body(new ApiResponse(result));
+            return ResponseEntity.status(200).body(result);
         }
     }
 }

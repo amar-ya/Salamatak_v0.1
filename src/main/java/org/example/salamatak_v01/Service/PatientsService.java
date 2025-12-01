@@ -62,7 +62,7 @@ public class PatientsService
     public String getHealthAdvice(String key){
         Patients p = patientsRepository.findPatientByLoginKey(key);
         PatientRecords records = patientRecordsRepository.findPatientRecordsById(p.getId());
-        return aiClient.getHealthAdvice(records.getHeight(),records.getWeight(),records.getBmi(),p.getBirth_date(), p.getGender());
+        return aiClient.getHealthAdvice(records.getHeight(),records.getWeight(),records.getBmi(),p.getBirth_date(), p.getGender(), p.getFirst_name());
     }
 
     public String getFeelingAdvice(String userDescription){
