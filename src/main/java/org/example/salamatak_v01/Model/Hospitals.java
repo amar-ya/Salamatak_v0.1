@@ -29,6 +29,9 @@ public class Hospitals
     @NotEmpty(message = "what is the phone number?")
     @Size(min = 8, max = 12, message = "first name shouldn't be less than 8 characters or more than 12")
     private String phone;
+    @NotEmpty(message = "the certificate id is required")
+    @Column(columnDefinition = "varchar(50) not null")
+    private String certificate;
     @Column(columnDefinition = "varchar(8)")
     @Pattern(regexp = "^(pending|accept|reject)$", message = "the active stat can only be pending accept or reject")
     private String is_active;
