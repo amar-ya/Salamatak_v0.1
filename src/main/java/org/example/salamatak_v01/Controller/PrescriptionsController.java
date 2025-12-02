@@ -6,7 +6,6 @@ import org.example.salamatak_v01.Api.ApiResponse;
 import org.example.salamatak_v01.Model.Prescriptions;
 import org.example.salamatak_v01.Service.PrescriptionsService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,50 +28,27 @@ public class PrescriptionsController
     }
 
     @PostMapping("/add/{doc_id}/{id}")
-    public ResponseEntity<?> addNewPrescription(@PathVariable Integer doc_id, @PathVariable Integer id, @RequestBody @Valid Prescriptions prescription, Errors errors){
-        if (errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else {
-            String result = prescriptionsService.addPrescription(doc_id, id, prescription);
-            if (result.equals("success")){
-                return ResponseEntity.status(200).body(new ApiResponse("prescription added successfully"));
-            }else {
-                return ResponseEntity.status(400).body(new ApiResponse(result));
-            }
-        }
+    public ResponseEntity<?> addNewPrescription(@PathVariable Integer doc_id, @PathVariable Integer id, @RequestBody @Valid Prescriptions prescription){
+        prescriptionsService.addPrescription(doc_id, id, prescription);
+        return ResponseEntity.status(200).body(new ApiResponse("prescription added successfully"));
+
     }
 
     @PutMapping("/update/{id}/{doc_id}")
-    public ResponseEntity<?> updatePrescription(@PathVariable Integer id, @PathVariable Integer doc_id, @RequestBody @Valid Prescriptions prescription, Errors errors){
-        if (errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else {
-            String result = prescriptionsService.updatePrescription(id, doc_id, prescription);
-            if (result.equals("success")){
-                return ResponseEntity.status(200).body(new ApiResponse("prescription updated successfully"));
-            }else {
-                return ResponseEntity.status(400).body(new ApiResponse(result));
-            }
-        }
+    public ResponseEntity<?> updatePrescription(@PathVariable Integer id, @PathVariable Integer doc_id, @RequestBody @Valid Prescriptions prescription){
+        prescriptionsService.updatePrescription(id, doc_id, prescription);
+        return ResponseEntity.status(200).body(new ApiResponse("prescription updated successfully"));
+
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deletePrescription(@PathVariable Integer id){
-        boolean result = prescriptionsService.deletePrescription(id);
-        if (result){
-            return ResponseEntity.status(200).body(new ApiResponse("prescription deleted successfully"));
-        }else {
-            return ResponseEntity.status(400).body(new ApiResponse("prescription not found"));
-        }
+        prescriptionsService.deletePrescription(id);
+        return ResponseEntity.status(200).body(new ApiResponse("prescription deleted successfully"));
     }
 
     @GetMapping("/find-my/prescriptions/{key}")
     public ResponseEntity<?> getPrescriptionByKey(@PathVariable String key){
-        List<Prescriptions> p = prescriptionsService.findMyPrescriptions(key);
-        if (p.isEmpty()){
-            return ResponseEntity.status(400).body(new ApiResponse("you dont have any prescriptions"));
-        }else {
-            return ResponseEntity.status(200).body(p);
-        }
+        return ResponseEntity.status(200).body(prescriptionsService.findMyPrescriptions(key));
     }
 }

@@ -1,6 +1,7 @@
 package org.example.salamatak_v01.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.salamatak_v01.Api.ApiException;
 import org.example.salamatak_v01.Model.Hospitals;
 import org.example.salamatak_v01.Repository.HospitalsRepository;
 import org.springframework.stereotype.Service;
@@ -22,24 +23,22 @@ public class HospitalsService
         hospitalsRepository.save(hospitals);
     }
 
-    public boolean updateHospital(Integer id, Hospitals hospitals){
+    public void updateHospital(Integer id, Hospitals hospitals){
         Hospitals h = hospitalsRepository.findHospitalsById(id);
         if (h != null){
             h.setCity(hospitals.getCity());
             h.setName(hospitals.getName());
             h.setPhone(hospitals.getPhone());
             hospitalsRepository.save(h);
-            return true;
         }
-        return false;
+        throw new ApiException("Hospitals not found");
     }
 
-    public boolean deleteHospital(Integer id){
+    public void deleteHospital(Integer id){
         Hospitals h = hospitalsRepository.findHospitalsById(id);
         if (h != null){
             hospitalsRepository.delete(h);
-            return true;
         }
-        return false;
+        throw new ApiException("Hospitals not found");
     }
 }

@@ -1,6 +1,7 @@
 package org.example.salamatak_v01.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.salamatak_v01.Api.ApiException;
 import org.example.salamatak_v01.Model.Doctors;
 import org.example.salamatak_v01.Model.Patients;
 import org.example.salamatak_v01.Model.UsersKeys;
@@ -66,12 +67,12 @@ public class UsersKeysService {
                 + " body: " + response.getBody());
     }
 
-    public String generatePatientOTP(Integer id){
+    public void generatePatientOTP(Integer id){
         Random random = new Random();
         UsersKeys k = usersKeyRepository.findByPatientId(id);
         Patients p =  usersKeyRepository.findPatientByKeyId(id);
         if (k == null){
-            return "Patient not found";
+            throw  new ApiException("Patient not found");
         }
         int number = random.nextInt(1_000_000);
         String otp = String.format("%06d", number);
@@ -82,26 +83,6 @@ public class UsersKeysService {
                 "\nIt expires in 5 minutes. Do not share this code with anyone.";
 
         sendWhatsappMessage("+966"+p.getPhone(), message);
-        return "success";
     }
 
-    public String generateDoctorOTP(Integer id){
-        Random random = new Random();
-        UsersKeys k = usersKeyRepository.findByDoctorId(id);
-        Doctors p =  usersKeyRepository.findDoctorByKeyId(id);
-        if (k == null){
-            return "doctor not found";
-        }
-        int number = random.nextInt(1_000_000);
-        String otp = String.format("%06d", number);
-        k.setOTP(otp);
-        k.setUsed(false);
-        usersKeyRepository.save(k);
-        // 3) send via UltraMsg
-        String message = "Your verification code is: " + otp +
-                "\nIt expires in 5 minutes. Do not share this code with anyone.";
-
-        sendWhatsappMessage("+966"+p.getPhone(), message);
-        return "success";
-    }
 }

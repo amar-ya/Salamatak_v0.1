@@ -6,7 +6,6 @@ import org.example.salamatak_v01.Api.ApiResponse;
 import org.example.salamatak_v01.Model.Hospitals;
 import org.example.salamatak_v01.Service.HospitalsService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,26 +34,14 @@ public class HospitalsController
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateHospital(@PathVariable Integer id, @RequestBody @Valid Hospitals hospitals,Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else {
-            boolean result = hospitalsService.updateHospital(id, hospitals);
-            if(result){
-                return ResponseEntity.status(200).body(new ApiResponse("hospital updated successfully"));
-            }else {
-                return ResponseEntity.status(400).body(new ApiResponse("hospital hospital not found"));
-            }
-        }
+    public ResponseEntity<?> updateHospital(@PathVariable Integer id, @RequestBody @Valid Hospitals hospitals){
+        hospitalsService.updateHospital(id, hospitals);
+        return ResponseEntity.status(200).body(new ApiResponse("hospital updated successfully"));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteHospital(@PathVariable Integer id){
-        boolean result = hospitalsService.deleteHospital(id);
-        if(result){
-            return ResponseEntity.status(200).body(new ApiResponse("hospital deleted successfully"));
-        }else {
-            return ResponseEntity.status(400).body(new ApiResponse("hospital not found"));
-        }
+       hospitalsService.deleteHospital(id);
+       return ResponseEntity.status(200).body(new ApiResponse("hospital deleted successfully"));
     }
 }

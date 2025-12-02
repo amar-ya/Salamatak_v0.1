@@ -7,10 +7,8 @@ import org.example.salamatak_v01.Model.Times;
 import org.example.salamatak_v01.Service.TimesService;
 import org.example.salamatak_v01.Service.VisitRecordsService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Time;
 import java.util.List;
 
 @RestController
@@ -19,7 +17,6 @@ import java.util.List;
 public class TimesController
 {
     private final TimesService timesService;
-    private final VisitRecordsService visitRecordsService;
 
     @GetMapping("/get")
     public ResponseEntity<?> getAllTimes(){
@@ -32,41 +29,21 @@ public class TimesController
     }
 
     @PostMapping("/add/{doc_id}")
-    public ResponseEntity<?> addSession(@PathVariable Integer doc_id, @RequestBody @Valid Times times, Errors errors){
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else {
-            String result = timesService.addTimes(doc_id, times);
-            if (result.equals("success")) {
-                return ResponseEntity.status(200).body(new ApiResponse("Session added successfully"));
-            }else {
-                return ResponseEntity.status(400).body(new ApiResponse(result));
-            }
-        }
+    public ResponseEntity<?> addSession(@PathVariable Integer doc_id, @RequestBody @Valid Times times){
+        timesService.addTimes(doc_id, times);
+        return ResponseEntity.status(200).body(new ApiResponse("Session added successfully"));
     }
 
     @PutMapping("/update/{id}/{doc_id}")
-    public ResponseEntity<?> updateTime(@PathVariable Integer id, @PathVariable Integer doc_id, @RequestBody @Valid Times times,Errors errors){
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else {
-            String result = timesService.updateTimes(id, doc_id, times);
-            if (result.equals("success")) {
-                return ResponseEntity.status(200).body(new ApiResponse("Session updated successfully"));
-            }else{
-                return ResponseEntity.status(400).body(new ApiResponse(result));
-            }
-        }
+    public ResponseEntity<?> updateTime(@PathVariable Integer id, @PathVariable Integer doc_id, @RequestBody @Valid Times times){
+        timesService.updateTimes(id, doc_id, times);
+        return ResponseEntity.status(200).body(new ApiResponse("Session updated successfully"));
     }
 
     @DeleteMapping("/delete/{id}/{doc_id}")
     public ResponseEntity<?> deleteTime(@PathVariable Integer id, @PathVariable Integer doc_id){
-        String result = timesService.deleteTimes(id, doc_id);
-        if (result.equals("success")) {
-            return ResponseEntity.status(200).body(new ApiResponse("Session deleted successfully"));
-        }else{
-            return ResponseEntity.status(400).body(new ApiResponse(result));
-        }
+        timesService.deleteTimes(id, doc_id);
+        return ResponseEntity.status(200).body(new ApiResponse("Session deleted successfully"));
     }
 
     @GetMapping("/get/avaliable-sessions/{speciality}")
@@ -81,32 +58,20 @@ public class TimesController
 
     @PutMapping("/reserve/session-time/{id}/{key}/{reason}")
     public ResponseEntity<?> reserveSessionTime(@PathVariable Integer id, @PathVariable String key, @PathVariable String reason){
-        String result = timesService.reserveSession(id,key,reason);
-        if (result.equals("success")) {
-            return ResponseEntity.status(200).body(new ApiResponse("Session reserved successfully"));
-        }else {
-            return ResponseEntity.status(400).body(new ApiResponse(result));
-        }
+        timesService.reserveSession(id,key,reason);
+        return ResponseEntity.status(200).body(new ApiResponse("Session reserved successfully"));
     }
 
     @PostMapping("/doctor-working/hours/{doc_id}/{start}/{end}")
     public ResponseEntity<?> addDoctorWorking(@PathVariable Integer doc_id,@PathVariable Integer start, @PathVariable Integer end){
-        String result = timesService.setWorkingHours(doc_id,start,end);
-        if (result.equals("success")) {
-            return ResponseEntity.status(200).body(new ApiResponse("WorkingHours added successfully"));
-        }else {
-            return ResponseEntity.status(400).body(new ApiResponse(result));
-        }
+        timesService.setWorkingHours(doc_id,start,end);
+        return ResponseEntity.status(200).body(new ApiResponse("WorkingHours added successfully"));
     }
 
     @PutMapping("/cancel/reservation/{id}/{key}")
     public ResponseEntity<?> cancelReservation(@PathVariable Integer id, @PathVariable String key){
-        String result = timesService.cancelReservation(id,key);
-        if (result.equals("success")) {
-            return ResponseEntity.status(200).body(new ApiResponse("reservation canceled successfully"));
-        }else {
-            return ResponseEntity.status(400).body(new ApiResponse(result));
-        }
+        timesService.cancelReservation(id,key);
+        return ResponseEntity.status(200).body(new ApiResponse("reservation canceled successfully"));
     }
 
 }

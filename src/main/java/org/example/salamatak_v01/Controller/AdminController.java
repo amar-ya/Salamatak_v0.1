@@ -6,7 +6,6 @@ import org.example.salamatak_v01.Api.ApiResponse;
 import org.example.salamatak_v01.Model.Admin;
 import org.example.salamatak_v01.Service.AdminService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

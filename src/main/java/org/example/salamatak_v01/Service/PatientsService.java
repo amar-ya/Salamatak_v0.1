@@ -2,6 +2,7 @@ package org.example.salamatak_v01.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.salamatak_v01.AiClient.OpenAiClient;
+import org.example.salamatak_v01.Api.ApiException;
 import org.example.salamatak_v01.Model.*;
 import org.example.salamatak_v01.Repository.PatientRecordsRepository;
 import org.example.salamatak_v01.Repository.PatientsRepository;
@@ -22,20 +23,19 @@ public class PatientsService
     private final UsersKeyRepository usersKeyRepository;
 
     public List<Patients> getPatients(){
-        return patientsRepository.findAll();
-    }
-
-    public String addPatient(Patients patient){
-        Patients p = patientsRepository.findPatientByNationalId(patient.getNational_id());
-        if (p==null){
-            patientsRepository.save(patient);
-            return "success";
-        }else {
-            return "an account with this National Id is already registered";
+        List<Patients> p = patientsRepository.findAll();
+        if (p.isEmpty())
+        {
+            throw new ApiException("No patients found");
         }
+        return p;
     }
 
-    public boolean updatePatient(Integer id, Patients patient){
+    public void addPatient(Patients patient){
+        patientsRepository.save(patient);
+    }
+
+    public void updatePatient(Integer id, Patients patient){
         Patients p = patientsRepository.findPatientById(id);
         if(p != null){
             p.setBirth_date(patient.getBirth_date());
@@ -45,18 +45,16 @@ public class PatientsService
             p.setGender(patient.getGender());
             p.setNational_id(patient.getNational_id());
             patientsRepository.save(p);
-            return true;
         }
-        return false;
+        throw new ApiException("patient not found");
     }
 
-    public boolean deletePatient(Integer id){
+    public void deletePatient(Integer id){
         Patients p = patientsRepository.findPatientById(id);
         if(p != null){
             patientsRepository.delete(p);
-            return true;
         }
-        return false;
+        throw new ApiException("patient not found");
     }
 
     public String getHealthAdvice(String key){
@@ -69,22 +67,21 @@ public class PatientsService
         return aiClient.getFeelingAdvice(userDescription);
     }
 
-    public String changePassword(String OTP ,String national_id, String password ){
+    public void changePassword(String OTP ,String national_id, String password ){
         Patients p = patientsRepository.findPatientByNationalId(national_id);
 
         if (p == null){
-            return "patient not found";
+            throw new ApiException("patient not found");
         }else {
             UsersKeys key = patientsRepository.findOTPByPatientId(p.getId());
             if (!Objects.equals(key.getOTP(), OTP)){
-                return "OTP does not match";
+                throw new ApiException("OTP does not match");
             }if(key.getUsed()){
-                return "OTP is used";
+                throw new ApiException("OTP is used");
             }else {
                 p.setPassword(password);
                 key.setUsed(true);
                 patientsRepository.save(p);
-                return "success";
             }
         }
     }
@@ -93,10 +90,10 @@ public class PatientsService
         Random random = new Random();
         Patients p = patientsRepository.findPatientByNationalId(national_id);
         if (p == null){
-            return "patient not found";
+            throw new ApiException("patient not found");
         }else{
             if(!password.equals(p.getPassword())){
-                return "password does not match";
+                throw new ApiException("password does not match");
             }else {
                 UsersKeys k = patientsRepository.findKeyByPatientId(p.getId());
                 int key = 50000 + random.nextInt(9999);
@@ -107,15 +104,14 @@ public class PatientsService
         }
     }
 
-    public String logOut(String key){
+    public void logOut(String key){
         Patients p = patientsRepository.findPatientByLoginKey(key);
         if(p == null){
-            return "patient not found";
+            throw new ApiException("patient not found");
         }else {
             UsersKeys Login_key = patientsRepository.findKeyByPatientId(p.getId());
             Login_key.setLogin_key(null);
             usersKeyRepository.save(Login_key);
-            return "success";
         }
     }
 
@@ -123,7 +119,7 @@ public class PatientsService
         Patients p = patientsRepository.findPatientByLoginKey(key);
         Times t = patientsRepository.findTimeByPatientId(p.getId());
         if (t == null){
-            return "failed";
+            throw new ApiException("you dont have session reserved");
         }else {
             Doctors d = patientsRepository.findDoctorBySessionsDoc_Id(t.getDoctor_id());
             String answer = aiClient.prepareQuestionsToAsksDoctor(t.getTime(),d.getSpeciality(),feeling);

@@ -1,6 +1,7 @@
 package org.example.salamatak_v01.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.salamatak_v01.Api.ApiException;
 import org.example.salamatak_v01.Model.Doctors;
 import org.example.salamatak_v01.Model.Patients;
 import org.example.salamatak_v01.Model.Prescriptions;
@@ -19,47 +20,48 @@ public class PrescriptionsService
         return prescriptionsRepository.findAll();
     }
 
-    public String addPrescription(Integer doc_id, Integer id, Prescriptions prescription){
+    public void addPrescription(Integer doc_id, Integer id, Prescriptions prescription){
         Doctors d = prescriptionsRepository.findDoctorById(doc_id);
         Patients p = prescriptionsRepository.findPatientById(id);
         if (d == null){
-            return "Doctors not found";
+            throw new ApiException("Doctor not found");
         }
         if (p == null){
-            return "Patient not found";
+            throw new ApiException("Patient not found");
         }
         prescription.setDoctor_Id(doc_id);
         prescription.setPatient_Id(id);
         prescriptionsRepository.save(prescription);
-        return "success";
     }
 
-    public String updatePrescription(Integer id,Integer doc_id, Prescriptions prescription){
+    public void updatePrescription(Integer id,Integer doc_id, Prescriptions prescription){
         Doctors d = prescriptionsRepository.findDoctorById(doc_id);
         Prescriptions p = prescriptionsRepository.findPrescriptionById(id);
         if (d == null){
-            return "Doctors not found";
+            throw new ApiException("Doctor not found");
         }else if (p == null){
-            return "Prescription not found";
+            throw new ApiException("Prescription not found");
         }else if (d.getId() != p.getDoctor_Id()){
-            return "This prescription does not belong to the doctor";
+            throw new ApiException("This prescription does not belong to the doctor");
         }else {
             p.setMedications(prescription.getMedications());
-            return "success";
         }
     }
 
-    public boolean deletePrescription(Integer id){
+    public void deletePrescription(Integer id){
         Prescriptions p = prescriptionsRepository.findPrescriptionById(id);
         if(p == null){
-            return false;
+            throw  new ApiException("Prescription not found");
         }else {
             prescriptionsRepository.delete(p);
-            return true;
         }
     }
 
     public List<Prescriptions> findMyPrescriptions(String Key){
-        return prescriptionsRepository.findPrescriptionByKey(Key);
+        List<Prescriptions> p = prescriptionsRepository.findPrescriptionByKey(Key);
+        if (p.isEmpty()){
+            throw new ApiException("Prescription not found");
+        }
+        return p;
     }
 }

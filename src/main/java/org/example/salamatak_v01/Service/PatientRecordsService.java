@@ -1,6 +1,7 @@
 package org.example.salamatak_v01.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.salamatak_v01.Api.ApiException;
 import org.example.salamatak_v01.Model.PatientRecords;
 import org.example.salamatak_v01.Repository.AdminRepository;
 import org.example.salamatak_v01.Repository.PatientRecordsRepository;
@@ -14,11 +15,17 @@ import java.util.List;
 public class PatientRecordsService
 {
     private final PatientRecordsRepository patientRecordsRepository;
-    private final PatientsRepository patientsRepository;
-    private final AdminRepository adminRepository;
+
 
     public List<PatientRecords> getAll(){
-        return patientRecordsRepository.findAll();
+        List<PatientRecords> pr = patientRecordsRepository.findAll();
+        if (pr.isEmpty())
+        {
+            throw new ApiException("Hospitals not found");
+        }else
+        {
+            return pr;
+        }
     }
 
     public void addPatientRecord(Integer user_id){
@@ -39,12 +46,15 @@ public class PatientRecordsService
             records.setHeart_rate(patientRecords.getHeart_rate());
             records.setBlood_pressure(patientRecords.getBlood_pressure());
             patientRecordsRepository.save(records);
-            return true;
         }
-        return false;
+        throw new ApiException("record not found");
     }
 
     public void deletePatientRecord(Integer user_id){
-        patientRecordsRepository.delete(patientRecordsRepository.findPatientRecordsByUserId(user_id));
+        PatientRecords pr = patientRecordsRepository.findPatientRecordsByUserId(user_id);
+        if (pr == null){
+            throw new ApiException("record not found");
+        }
+        patientRecordsRepository.delete(pr);
     }
 }

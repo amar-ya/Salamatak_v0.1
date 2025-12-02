@@ -1,6 +1,7 @@
 package org.example.salamatak_v01.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.salamatak_v01.Api.ApiException;
 import org.example.salamatak_v01.Model.Doctors;
 import org.example.salamatak_v01.Model.Patients;
 import org.example.salamatak_v01.Model.Times;
@@ -61,61 +62,62 @@ public class TimesService
         return timesRepository.findAll();
     }
 
-    public String addTimes(Integer doctor_id, Times times){
+    public void addTimes(Integer doctor_id, Times times){
         Integer workingHours = timesRepository.findTimesCountByDoctor_id(doctor_id);
         if(workingHours>= 8){
-            return "your working schedule is full";
+            throw new ApiException("your working schedule is full");
         }else{
             times.setDoctor_id(doctor_id);
             timesRepository.save(times);
-            return "success";
         }
     }
 
-    public String updateTimes(Integer id, Integer doctor_id, Times times){
+    public void updateTimes(Integer id, Integer doctor_id, Times times){
         Doctors doctor = timesRepository.findDoctorByTime(doctor_id);
         Times session = timesRepository.findTimesById(id);
         if (doctor.getId().equals(session.getDoctor_id())){
             session.setTime(times.getTime());
             session.setDoctor_id(doctor_id);
             timesRepository.save(session);
-            return "success";
         } else if (doctor == null) {
-            return "doctor not found";
+            throw new ApiException("doctor not found");
         }else if(!session.getDoctor_id().equals(doctor.getId())){
-            return "this session does not belong to the doctor";
+            throw new ApiException("this session does not belong to the doctor");
         }else{
-            return "session does not exist";
+            throw  new ApiException("session does not exist");
         }
     }
 
-    public String deleteTimes(Integer id, Integer doctor_id) {
+    public void deleteTimes(Integer id, Integer doctor_id) {
         Times session = timesRepository.findTimesById(id);
         if (doctor_id.equals(session.getDoctor_id())){
             timesRepository.delete(session);
-            return "success";
         } else if (session == null) {
-            return "session not found";
+            throw new ApiException("session not found");
         }else {
-            return "this session does not belong to the doctor";
+            throw  new ApiException("this session does not belong to the doctor");
         }
     }
 
     public List<Times> findAvaliableTimes(String speciality){
-        return timesRepository.findAvaliableTimesBySpeciality(speciality);
+        List<Times> t = timesRepository.findAvaliableTimesBySpeciality(speciality);
+        if (t.isEmpty()){
+            throw new ApiException("times with the chosen speciality not found");
+        }
+        return t;
     }
 
-    public String reserveSession(Integer id, String key, String reason) {
+    public void reserveSession(Integer id, String key, String reason) {
         Times times = timesRepository.findTimesById(id);
         Doctors d = timesRepository.findDoctorByTime(times.getDoctor_id());
         if (times.getPatient_id() != null){
-            return "this session is already reserved";
+            throw new ApiException("this session is already reserved");
         }else if(times == null){
-            return "there is no session to reserve at this time";
+            throw new ApiException("there is no session to reserve at this time");
         }else{
             Patients p = patientsRepository.findPatientByLoginKey(key);
             if (p == null){
-                return "patient not found";
+                throw new ApiException("patient not found");
             }
             times.setPatient_id(p.getId());
             times.setReason(reason);
@@ -126,20 +128,19 @@ public class TimesService
             v.setPatient_id(p.getId());
             visitRecordsService.addVisitRecords(times.getDoctor_id(), v);
             sendWhatsappMessage(p.getPhone(), "hello Mr."+p.getFirst_name()+" session has been reserved at " + times.getTime() + " with Dr."+d.getFirst_name()+" "+d.getLast_name()+"\nyou can cancel it an hour before the session at max");
-            return "success";
         }
     }
 
-    public String setWorkingHours(Integer doc_id, Integer startTime, Integer endTime){
+    public void setWorkingHours(Integer doc_id, Integer startTime, Integer endTime){
         Integer workingHours = timesRepository.findTimesCountByDoctor_id(doc_id);
         if (workingHours == null) {
             workingHours = 0;
         }
         int newSessions = endTime - startTime + 1;
         if (workingHours + newSessions > 8) {
-            return "your working schedule is full";
+            throw new ApiException("your working schedule is full");
         }if (startTime == null || endTime == null || startTime < 0 || endTime > 23 || endTime < startTime) {
-            return "invalid time range";
+            throw new ApiException("invalid time range");
         }else {
             for(int i = startTime ; i <= endTime ; i++){
                 Times newSession = new Times();
@@ -148,22 +149,21 @@ public class TimesService
                 newSession.setDoctor_id(doc_id);
                 timesRepository.save(newSession);
             }
-            return "success";
         }
     }
 
-    public String cancelReservation(Integer id, String key){
+    public void cancelReservation(Integer id, String key){
         Times sessions = timesRepository.findTimesById(id);
         VisitRecords v = timesRepository.findVisitByDoctorAndPatient(sessions.getDoctor_id(), sessions.getPatient_id());
         if(sessions == null){
-            return "session not found";
+            throw new ApiException("session not found");
         }else {
             Patients p = patientsRepository.findPatientByLoginKey(key);
             if (p == null){
-                return "patient not found";
+                throw new ApiException("patient not found");
             }
             if (v.getDoctor_comments() != null){
-                return "you have attended this session already so you cant cancel it";
+                throw new ApiException("you have attended this session already so you cant cancel it");
             }
             visitRecordsRepository.delete(v);
             sessions.setPatient_id(null);
@@ -171,7 +171,6 @@ public class TimesService
             timesRepository.save(sessions);
             Doctors d = timesRepository.findDoctorByTime(sessions.getDoctor_id());
             sendWhatsappMessage(p.getPhone(), "hello Mr."+p.getFirst_name()+" session has been canceled were scheduled at " + sessions.getTime() + " with Dr."+d.getFirst_name()+" "+d.getLast_name()+" successfully");
-            return "success";
         }
     }
 }

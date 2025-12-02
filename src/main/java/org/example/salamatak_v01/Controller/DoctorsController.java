@@ -7,7 +7,6 @@ import org.example.salamatak_v01.Model.Doctors;
 import org.example.salamatak_v01.Model.VisitRecords;
 import org.example.salamatak_v01.Service.DoctorsService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
