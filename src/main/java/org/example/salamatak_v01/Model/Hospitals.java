@@ -20,6 +20,7 @@ public class Hospitals
     @NotEmpty(message = "hospital's name is required")
     @Column(columnDefinition = "varchar(40) not null")
     @Size(min = 4, max = 40, message = "name shouldn't be less than 4 characters or more than 40")
+    @Pattern(regexp = "^[a-zA-Z ]+$",message = "the hospital name shouldn't contain digits and symbols")
     private String name;
     @NotEmpty(message = "in what city this hospital located?")
     @Column(columnDefinition = "varchar(15) not null")
