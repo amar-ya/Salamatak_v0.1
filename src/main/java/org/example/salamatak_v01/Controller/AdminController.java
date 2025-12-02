@@ -20,65 +20,36 @@ public class AdminController
 
     @GetMapping("/get")
     public ResponseEntity<?> getAdmins(){
-        List<Admin> admin = adminService.getAll();
-        if (admin.isEmpty()){
-            return ResponseEntity.status(400).body(new ApiResponse("there are not admins yet"));
-        }else {
-            return ResponseEntity.status(200).body(admin);
-        }
+        return ResponseEntity.status(200).body(adminService.getAll());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addAdmin(@RequestBody @Valid Admin admin, Errors errors){
-        if (errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else{
-            adminService.addAdmin(admin);
-            return ResponseEntity.status(200).body(new ApiResponse("admin added successfully"));
-        }
+    public ResponseEntity<?> addAdmin(@RequestBody @Valid Admin admin){
+        adminService.addAdmin(admin);
+        return ResponseEntity.status(200).body(new ApiResponse("admin added successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateAdmin(@PathVariable Integer id, @RequestBody @Valid Admin admin, Errors errors){
-        if (errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else {
-            boolean result = adminService.updateAdmin(id, admin);
-            if (result){
-                return ResponseEntity.status(200).body(new ApiResponse("admin updated successfully"));
-            }else {
-                return ResponseEntity.status(400).body(new ApiResponse("admin not found"));
-            }
-        }
+    public ResponseEntity<?> updateAdmin(@PathVariable Integer id, @RequestBody @Valid Admin admin){
+        adminService.updateAdmin(id, admin);
+        return ResponseEntity.status(200).body(new ApiResponse("admin updated successfully"));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteAdmin(@PathVariable Integer id){
-        boolean result = adminService.deleteAdmin(id);
-        if (result){
-            return ResponseEntity.status(200).body(new ApiResponse("admin deleted successfully"));
-        }else {
-            return ResponseEntity.status(400).body(new ApiResponse("admin not found"));
-        }
+        adminService.deleteAdmin(id);
+        return ResponseEntity.status(200).body(new ApiResponse("admin deleted successfully"));
     }
 
     @PutMapping("/activate-hospital/{id}")
     public ResponseEntity<?> activateHospital(@PathVariable Integer id){
-        String result = adminService.activateHospital(id);
-        if (result.equals("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("hospital activated successfully"));
-        }else {
-            return ResponseEntity.status(400).body(new ApiResponse(result));
-        }
+        adminService.activateHospital(id);
+        return ResponseEntity.status(200).body(new ApiResponse("hospital activated successfully"));
     }
 
     @PutMapping("/reject-hospital/{id}")
     public ResponseEntity<?> rejectHospital(@PathVariable Integer id){
-        String result = adminService.rejectHospital(id);
-        if (result.equals("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("hospital rejected successfully"));
-        }else {
-            return ResponseEntity.status(400).body(new ApiResponse(result));
-        }
+        adminService.rejectHospital(id);
+        return ResponseEntity.status(200).body(new ApiResponse("hospital rejected successfully"));
     }
 }

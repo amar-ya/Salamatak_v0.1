@@ -2,6 +2,7 @@ package org.example.salamatak_v01.Service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.salamatak_v01.Api.ApiException;
 import org.example.salamatak_v01.Model.*;
 import org.example.salamatak_v01.Repository.*;
 import org.example.salamatak_v01.WhatsappConfig.UltraMsgProperties;
@@ -29,22 +30,26 @@ public class DoctorsService
     private final RestTemplate restTemplate = new RestTemplate();
 
     public List<Doctors> getAll(){
-        return doctorsRepository.findAll();
+        List<Doctors> d =  doctorsRepository.findAll();
+        if (d.isEmpty()){
+            throw new ApiException("No doctors found");
+        }else {
+            return d;
+        }
     }
 
-    public String addDoctor(Integer hospital_id,Doctors doctors){
+    public void addDoctor(Integer hospital_id,Doctors doctors){
         Hospitals requester = hospitalsRepository.findHospitalsById(hospital_id);
         if (requester.getIs_active().equals("pending") || requester.getIs_active().equals("reject")){
-            return "hospital is not active";
+            throw new ApiException("hospital is not active");
         }else if (requester.getId().equals(doctors.getHospital_id())){
             doctors.setHospital_id(hospital_id);
             doctorsRepository.save(doctors);
-            return "success";
         }
-        return "hospital not found";
+        throw new ApiException("hospital not found");
     }
 
-    public String updateDoctor(Integer id,Integer hospital_id, Doctors doctors){
+    public void updateDoctor(Integer id,Integer hospital_id, Doctors doctors){
         Hospitals requester = hospitalsRepository.findHospitalsById(hospital_id);
         Doctors oldDoctor = doctorsRepository.findDoctorsById(id);
         if (requester.getId().equals(doctors.getHospital_id())){
@@ -53,36 +58,34 @@ public class DoctorsService
             oldDoctor.setHospital_id(doctors.getHospital_id());
             oldDoctor.setSpeciality(doctors.getSpeciality());
             doctorsRepository.save(oldDoctor);
-            return "success";
         }else if (requester == null){
-            return "hospital not found";
+            throw new ApiException("hospital not found");
         }else if(oldDoctor == null){
-            return "doctor not found";
+            throw new ApiException("doctor not found");
         }
-        return "this doctor does not work at this hospital";
+        throw new ApiException("this doctor does not work at this hospital");
     }
 
-    public String deleteDoctor(Integer id, Integer hospital_id){
+    public void deleteDoctor(Integer id, Integer hospital_id){
         Hospitals h = hospitalsRepository.findHospitalsById(hospital_id);
         Doctors d = doctorsRepository.findDoctorsById(id);
         if (h.getId().equals(d.getHospital_id())){
             doctorsRepository.delete(d);
-            return "success";
         }else if(h != null){
-            return "hospital not found";
+            throw new ApiException("hospital not found");
         }else if(d != null){
-            return "doctor not found";
+            throw new ApiException("doctor not found");
         }
-        return "this doctor does not work at this hospital";
+        throw new ApiException("this doctor does not work at this hospital");
     }
 
 
-    public String addComment(Integer patient_id, Integer doc_id, VisitRecords record){
+    public void addComment(Integer patient_id, Integer doc_id, VisitRecords record){
         VisitRecords v = doctorsRepository.findVisitRecordByDoctorAndPatientId(doc_id,patient_id);
         if (v == null){
-            return "visit record not found";
+            throw new ApiException("visit record not found");
         }else if (!Objects.equals(v.getDoctor_id(), doc_id)){
-            return "this visit doesnt belong to this doctor";
+            throw new ApiException("this visit doesnt belong to this doctor");
         }else {
             if(record.getBlood_pressure() != null){
                 v.setBlood_pressure(record.getBlood_pressure());
@@ -107,9 +110,7 @@ public class DoctorsService
             Patients p = doctorsRepository.findPatientById(patient_id);
             Doctors d = doctorsRepository.findDoctorsById(doc_id);
             String message = "DR."+d.getFirst_name()+"'s visit comment : "+record.getDoctor_comments();
-
             sendWhatsappMessage("+966"+p.getPhone(), message);
-            return "success";
         }
     }
 

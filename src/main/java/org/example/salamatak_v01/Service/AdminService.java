@@ -2,6 +2,7 @@ package org.example.salamatak_v01.Service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.salamatak_v01.Api.ApiException;
 import org.example.salamatak_v01.Model.Admin;
 import org.example.salamatak_v01.Model.Hospitals;
 import org.example.salamatak_v01.Repository.AdminRepository;
@@ -18,55 +19,56 @@ public class AdminService
     private final HospitalsRepository hospitalsRepository;
 
     public List<Admin> getAll(){
-        return adminRepository.findAll();
+        List<Admin> admins =  adminRepository.findAll();
+        if (admins.isEmpty()){
+            throw new ApiException("No admins found");
+        }else {
+            return admins;
+        }
     }
 
     public void addAdmin(Admin admin){
         adminRepository.save(admin);
     }
 
-    public boolean updateAdmin(Integer id, Admin newAdmin){
+    public void updateAdmin(Integer id, Admin newAdmin){
         Admin oldAdmin = adminRepository.findAdminById(id);
         if(oldAdmin != null){
             oldAdmin.setName(newAdmin.getName());
             adminRepository.save(oldAdmin);
-            return true;
         }
-        return false;
+        throw new ApiException("No admin found");
     }
 
-    public boolean deleteAdmin(Integer id){
+    public void deleteAdmin(Integer id){
         Admin admin = adminRepository.findAdminById(id);
         if (admin != null){
             adminRepository.delete(admin);
-            return true;
         }
-        return false;
+        throw new ApiException("there are no admins with this id");
     }
 
-    public String activateHospital(Integer id){
+    public void activateHospital(Integer id){
         Hospitals h = hospitalsRepository.findHospitalsById(id);
         if (h == null){
-            return "this hospital are not registered yet";
+            throw new ApiException("this hospital are not registered yet");
         }else if (h.getIs_active().equals("accept")){
-            return "this hospital is already activated";
+            throw new ApiException("this hospital is already activated");
         }else {
             h.setIs_active("accept");
             hospitalsRepository.save(h);
-            return "success";
         }
     }
 
-    public String rejectHospital(Integer id){
+    public void rejectHospital(Integer id){
         Hospitals h = hospitalsRepository.findHospitalsById(id);
         if(h == null){
-            return "this hospital are not registered yet";
+            throw new ApiException("this hospital are not registered yet");
         }else if(h.getIs_active().equals("reject")){
-            return "this hospital is already rejected";
+            throw new ApiException("this hospital is already rejected");
         }else {
             h.setIs_active("reject");
             hospitalsRepository.save(h);
-            return "success";
         }
     }
 }

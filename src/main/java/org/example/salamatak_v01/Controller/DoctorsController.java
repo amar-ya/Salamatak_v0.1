@@ -21,64 +21,31 @@ public class DoctorsController
 
     @GetMapping("/get")
     public ResponseEntity<?> getDoctors(){
-        List<Doctors> docs = doctorsService.getAll();
-        if (docs.isEmpty()){
-            return ResponseEntity.status(400).body(new ApiResponse("there are no doctors added yet"));
-        }else {
-            return ResponseEntity.status(200).body(docs);
-        }
+        return ResponseEntity.status(200).body(doctorsService.getAll());
     }
 
     @PostMapping("/add/{id}")
-    public ResponseEntity<?> addDoctor(@PathVariable Integer id ,@RequestBody @Valid Doctors doctors, Errors errors){
-        if (errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else{
-            String result = doctorsService.addDoctor(id, doctors);
-            if (result.equals("success")){
-                return ResponseEntity.status(200).body(new ApiResponse("doctor added successfully"));
-            }else {
-                return ResponseEntity.status(400).body(new ApiResponse("doctor add failed"));
-            }
-        }
+    public ResponseEntity<?> addDoctor(@PathVariable Integer id ,@RequestBody @Valid Doctors doctors){
+        doctorsService.addDoctor(id, doctors);
+        return ResponseEntity.status(200).body(new ApiResponse("doctor added successfully"));
     }
 
     @PutMapping("/update/{doc_id}/{hos_id}")
-    public ResponseEntity<?> updateDoctorProfile(@PathVariable Integer doc_id, @PathVariable Integer hos_id, @RequestBody @Valid Doctors doctors, Errors errors){
-        if (errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else {
-            String result = doctorsService.updateDoctor(doc_id,hos_id,doctors);
-            if (result.equals("success")){
-                return ResponseEntity.status(200).body(new ApiResponse("doctor updated successfully"));
-            }else {
-                return ResponseEntity.status(400).body(new ApiResponse(result));
-            }
-        }
+    public ResponseEntity<?> updateDoctorProfile(@PathVariable Integer doc_id, @PathVariable Integer hos_id, @RequestBody @Valid Doctors doctors){
+        doctorsService.updateDoctor(doc_id,hos_id,doctors);
+        return ResponseEntity.status(200).body(new ApiResponse("doctor updated successfully"));
     }
 
     @DeleteMapping("/delete/{doc_id}/{hos_id}")
     public ResponseEntity<?> deleteDoctor(@PathVariable Integer doc_id,@PathVariable Integer hos_id){
-        String result = doctorsService.deleteDoctor(doc_id,hos_id);
-        if (result.equals("success")){
-            return ResponseEntity.status(200).body(new ApiResponse("doctor deleted successfully"));
-        }else {
-            return ResponseEntity.status(400).body(new ApiResponse(result));
-        }
+        doctorsService.deleteDoctor(doc_id,hos_id);
+        return ResponseEntity.status(200).body(new ApiResponse("doctor deleted successfully"));
     }
 
 
     @PutMapping("/finish-session/{id}/{doc_id}")
-    public ResponseEntity<?> finishSession(@PathVariable Integer id, @PathVariable Integer doc_id, @RequestBody @Valid VisitRecords visit,Errors errors){
-        if (errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else {
-            String result = doctorsService.addComment(id, doc_id, visit);
-            if (result.equals("success")){
-                return ResponseEntity.status(200).body(new ApiResponse("doctor finished session successfully"));
-            }else {
-                return ResponseEntity.status(400).body(new ApiResponse(result));
-            }
-        }
+    public ResponseEntity<?> finishSession(@PathVariable Integer id, @PathVariable Integer doc_id, @RequestBody @Valid VisitRecords visit){
+        doctorsService.addComment(id, doc_id, visit);
+        return ResponseEntity.status(200).body(new ApiResponse("doctor finished session successfully"));
     }
 }

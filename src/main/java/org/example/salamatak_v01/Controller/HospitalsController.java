@@ -29,13 +29,9 @@ public class HospitalsController
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addHospital(@RequestBody @Valid Hospitals hospitals, Errors errors){
-        if(errors.hasErrors()){
-            return ResponseEntity.status(400).body(new ApiResponse(errors.getFieldError().getDefaultMessage()));
-        }else {
-            hospitalsService.addHospital(hospitals);
-            return ResponseEntity.status(200).body(new ApiResponse("hospital added successfully and it has to be activated by an admin"));
-        }
+    public ResponseEntity<?> addHospital(@RequestBody @Valid Hospitals hospitals){
+        hospitalsService.addHospital(hospitals);
+        return ResponseEntity.status(200).body(new ApiResponse("hospital added successfully and it has to be activated by an admin"));
     }
 
     @PutMapping("/update/{id}")
